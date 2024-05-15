@@ -1,5 +1,6 @@
 from Util.DBConn import DBConnection
 from abc import ABC, abstractmethod
+from Exceptions.exceptions import ReservationException
 
 class IReservationService(ABC):
     @abstractmethod
@@ -36,16 +37,20 @@ class ReservationService(DBConnection, IReservationService):
                        Customer on Reservation.CustomerID = Customer.CustomerID where Customer.Username = ? """,(username))
         return self.cursor.fetchall()
     def CreateReservation(self,reserv):
-        vehicle = self.vehiserv.GetVehicleByID(reserv.get_vehicleid())
-        if vehicle and vehicle[6] == True:
-            self.cursor.execute("Insert into Reservation Values (?,?,?,?,?,?)",
-                           (reserv.get_customerid(),reserv.get_vehicleid(),reserv.get_startdate(),reserv.get_enddate(),
-                            reserv.get_totalcost(),reserv.get_status()))
-            self.cursor.execute("update Vehicle set Availability = 0 where VehicleID = ?",reserv.get_vehicleid())
-            self.conn.commit()
-            print("Reservation Created Successfully")
-        else:
-            print("Vehicle Not Found or unavailable")
+        try:
+            vehicle = self.vehiserv.GetVehicleByID(reserv.get_vehicleid())
+            if vehicle and vehicle[6] == True:
+                self.cursor.execute("Insert into Reservation Values (?,?,?,?,?,?)",
+                            (reserv.get_customerid(),reserv.get_vehicleid(),reserv.get_startdate(),reserv.get_enddate(),
+                                reserv.get_totalcost(),reserv.get_status()))
+                self.cursor.execute("update Vehicle set Availability = 0 where VehicleID = ?",reserv.get_vehicleid())
+                self.conn.commit()
+                print("Reservation Created Successfully")
+            else:
+                print("Vehicle Not Found or unavailable")
+                raise ReservationException
+        except ReservationException as e:
+            print(e)
     def UpdateReservation(self,updater,reservid,reservation):
         if updater == "customer":
             cusomerid = reservation.get_customerid()

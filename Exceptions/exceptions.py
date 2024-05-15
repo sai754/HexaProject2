@@ -4,7 +4,7 @@ class AuthenticationException(Exception):
         super().__init__(self.message)
 
 class ReservationException(Exception):
-    def __init__(self, message="Reservation error."):
+    def __init__(self, message="Reservation error, Cant create Reservation "):
         self.message = message
         super().__init__(self.message)
 
