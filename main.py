@@ -1,23 +1,24 @@
-from Entity import Reservation, Customer, Admin, Vehicle
+from Entity import Reservation, Customer, Admin, Vehicle, ReportGenerator
+from DAO import ReservationService, AdminService, AuthenticationService, CustomerService, VehicleService
 import pyodbc
 import datetime 
 from tabulate import tabulate
 
-server_name = "DESKTOP-PR637UP"
-database_name = "CarConnect"
+# server_name = "DESKTOP-PR637UP"
+# database_name = "CarConnect"
  
  
-conn_str = (
-    f"Driver={{ODBC Driver 17 for SQL Server}};"
-    f"Server={server_name};"
-    f"Database={database_name};"
-    f"Trusted_Connection=yes;"
-)
+# conn_str = (
+#     f"Driver={{ODBC Driver 17 for SQL Server}};"
+#     f"Server={server_name};"
+#     f"Database={database_name};"
+#     f"Trusted_Connection=yes;"
+# )
 
-conn = pyodbc.connect(conn_str)
-cursor = conn.cursor()
+# conn = pyodbc.connect(conn_str)
+# cursor = conn.cursor()
 
-print("Database Connected")
+# print("Database Connected")
 
 
 
@@ -35,254 +36,17 @@ print("Database Connected")
 # Service classes
 # Authentication Service
 
-class AuthenticationService:
-    def __init__(self, service):
-        self.service = service
-    def authenticate_customer(self, username, password):
-        customer_data = self.service.GetCustomerByUsername(username)
-        if customer_data:
-            customer_obj = Customer(*customer_data[1:])
-            return customer_obj.Authenticate(password)
-        else:
-            print("Customer not found.")
-            return False
-    def authenticate_admin(self, username, password):
-        admin_data = self.service.GetAdminByUsername(username)
-        print(admin_data)
-        if admin_data:
-            admin_obj = Admin(*admin_data[1:])
-            return admin_obj.Authenticate(password)
-        else:
-            print("Admin not found.")
-            return False
 
 
 #Customer Service    
-class CustomerService:
-
-    def GetCustomer(self,username):
-        cursor.execute("select * from Customer where Username = ?",(username))
-        for row in cursor:
-            print(row)
-    def GetCustomerByID(self,id):
-        cursor.execute("Select * from Customer where CustomerID = ?",(id,))
-        return cursor.fetchone()
-
-    def GetCustomerByUsername(self,username):
-        cursor.execute("Select * from Customer where Username = ?",(username,))
-        return cursor.fetchone()
-
-    def RegisterCustomer(self,newCustomer):
-        cursor.execute("insert into Customer values (?,?,?,?,?,?,?,?)",
-                    (newCustomer.get_firstname(), newCustomer.get_lastname(), newCustomer.get_email(),
-                    newCustomer.get_phonenumber(), newCustomer.get_address(), newCustomer.get_username(),
-                    newCustomer.get_password(), newCustomer.get_registrationdate()))
-        conn.commit()
-        print("Registered Successfully")
-
-    def UpdateCustomer(self,customer,customername):
-        cursor.execute("""
-                    UPDATE Customer
-                    SET FirstName = ?, LastName = ?, Email = ?, PhoneNumber = ?, Address = ?, Username = ?, Password = ?
-                    WHERE Username = ?
-                    """,
-                    (customer.get_firstname(), customer.get_lastname(), customer.get_email(),
-                     customer.get_phonenumber(), customer.get_address(), customer.get_username(),
-                     customer.get_password(),customername))
-        conn.commit()
-        print("Updated Successfully")
-
-    def DeleteCustomer(self,id):
-        cursor.execute("Delete from Reservation where CustomerID = ?",(id))
-        cursor.execute("Delete from Customer where CustomerID = ?",(id))
-        conn.commit()
-        print("Deleted Successfully")
-
-    def CheckOwnership(self, reservation_id, customer_id):
-        cursor.execute("SELECT CustomerID FROM Reservation WHERE ReservationID = ?", (reservation_id,))
-        fetched_customer_id = cursor.fetchone()[0] 
-        return fetched_customer_id == customer_id
-    
-    def GetCustomerID(self,username):
-        cursor.execute("Select CustomerID from Customer where Username = ?",(username))
-        custid = cursor.fetchone()[0]
-        return custid
 
 # Vehicle Service
-class VehicleService:
-    def GetVehicle(self):
-        cursor.execute("Select * from Vehicle")
-        vehicles = cursor.fetchall()
-        headers = [column[0] for column in cursor.description]
-        print(tabulate(vehicles,headers=headers,tablefmt="psql"))
-    def GetVehicleByID(self,id):
-        cursor.execute("Select * from Vehicle where VehicleID = ?",(id))
-        return cursor.fetchone()
-    def GetAvailableVehicle(self):
-        cursor.execute("Select * from Vehicle where Availability = 1")
-        vehicles = cursor.fetchall()
-        headers = [column[0] for column in cursor.description]
-        print(tabulate(vehicles,headers=headers,tablefmt="psql"))
-    def AddVehicle(self,vehicle):
-        cursor.execute("insert into Vehicle values (?,?,?,?,?,?,?)",
-                       (vehicle.get_model(), vehicle.get_make(), vehicle.get_year(),
-                        vehicle.get_color(), vehicle.get_registrationnumber(),
-                        vehicle.get_availability(), vehicle.get_dailyrate()))
-        conn.commit()
-        print("Added Successfully")
-    
-    def UpdateVehicle(self,vehicle,vehicleid):
-        cursor.execute("""
-                       update vehicle
-                       set Model = ?, Make = ?, Year = ?, Color = ?, RegistrationNumber = ?, Availability = ?, DailyRate = ?
-                       where VehicleID = ?""",
-                       (vehicle.get_model(), vehicle.get_make(), vehicle.get_year(),
-                        vehicle.get_color(), vehicle.get_registrationnumber(),
-                        vehicle.get_availability(), vehicle.get_dailyrate(),vehicleid))
-        conn.commit()
-        print("Updated Successfully")
-    
-    def RemoveVehicle(self,id):
-        cursor.execute("delete from Vehicle where VehicleID = ?",(id))
-        conn.commit()
-        print("Deleted Successfully")
-    
-    def GetAllVehicles(self):
-        cursor.execute("select * from Vehicle")
-        vehicles =  cursor.fetchall()
-        headers = [column[0] for column in cursor.description]
-        return vehicles, headers
 
 # Admin Service
-class AdminService:
-    def GetAdmin(self,username):
-        cursor.execute("select * from Admin where Username = ? ",(username))
-        admin = cursor.fetchone()
-        headers = [column[0] for column in cursor.description]
-        print(tabulate(admin,headers=headers,tablefmt="psql"))
-    def GetAdminById(self,id):
-        cursor.execute("Select * from Admin where AdminID = ?",(id))
-        return cursor.fetchone()
-    
-    def GetAdminByUsername(self,username):
-        cursor.execute("select * from Admin where Username = ? ",(username))
-        return cursor.fetchone()
-    
-    def RegisterAdmin(self,admin):
-        cursor.execute("insert into Admin values(?,?,?,?,?,?,?,?)",
-                       (admin.get_firstname(), admin.get_lastname(), admin.get_email(),
-                        admin.get_phonenumber(), admin.get_username(), admin.get_password(),
-                        admin.get_role(), admin.get_joindate()))
-        conn.commit()
-        print("Registered Successfully")
-    
-    def UpdateAdmin(self,admin,adminname):
-        cursor.execute("""Update Admin
-                       set FirstName = ?, LastName = ?, Email = ?, PhoneNumber = ?, Username = ?, Password = ?,
-                       Role = ?, JoinDate = ?
-                       where Username = ?""",
-                       (admin.get_firstname(), admin.get_lastname(), admin.get_email(),
-                        admin.get_phonenumber(), admin.get_username(), admin.get_password(),
-                        admin.get_role(), admin.get_joindate(),adminname))
-        conn.commit()
-        print("Updated Successfully")
-    
-    def DeleteAdmin(self,adminname):
-        cursor.execute("delete from Admin where Username = ?",(adminname))
-        conn.commit()
-        print("Deleted Successfully")
 
-class ReservationService:
-    def __init__(self,custservice,vehiserv):
-        self.custservice = custservice
-        self.vehiserv = vehiserv
-    
-    def GetReservationByID(self,reservID):
-        cursor.execute("Select * from Reservation where ReservationID = ?",(reservID))
-        return cursor.fetchone()
-    
-    def GetReservationByCustomerID(self,custid):
-        cursor.execute("Select * from Reservation where CustomerID = ?",(custid))
-        return cursor.fetchall()
 
-    def GetReservationByCustomerName(self,username):
-        cursor.execute("""Select ReservationID,Reservation.CustomerID,VehicleID, StartDate,EndDate,TotalCost,Status from Reservation join 
-                       Customer on Reservation.CustomerID = Customer.CustomerID where Customer.Username = ? """,(username))
-        return cursor.fetchall()
-    def CreateReservation(self,reserv):
-        vehicle = self.vehiserv.GetVehicleByID(reserv.get_vehicleid())
-        if vehicle and vehicle[6] == True:
-            cursor.execute("Insert into Reservation Values (?,?,?,?,?,?)",
-                           (reserv.get_customerid(),reserv.get_vehicleid(),reserv.get_startdate(),reserv.get_enddate(),
-                            reserv.get_totalcost(),reserv.get_status()))
-            cursor.execute("update Vehicle set Availability = 0 where VehicleID = ?",reserv.get_vehicleid())
-            conn.commit()
-            print("Reservation Created Successfully")
-        else:
-            print("Vehicle Not Found or unavailable")
-    def UpdateReservation(self,updater,reservid,reservation):
-        if updater == "customer":
-            cusomerid = reservation.get_customerid()
-            if self.custservice.CheckOwnership(reservid,cusomerid):
-                cursor.execute("""
-                               update Reservation
-                               set StartDate = ?, EndDate = ?, TotalCost = ?, Status = ?
-                               where ReservationID = ?""",
-                               (reservation.get_startdate(),reservation.get_enddate(),
-                               reservation.get_totalcost(),reservation.get_status(),reservid))
-                conn.commit()
-                print("Reservation Updated Successfully")
-            else:
-                print("Your are not authorized to update this reservation")
-        elif updater == "Admin":
-            cursor.execute("""
-                           update Reservation
-                           set CustomerID = ?, VehicleID = ?, StartDate = ?, EndDate = ?, TotalCost = ?, Status = ?
-                           where ReservationID = ?""",
-                           (reservation.get_customerid(),reservation.get_vehicleid(),reservation.get_startdate(),reservation.get_enddate(),
-                            reservation.get_totalcost(),
-                            reservation.get_status(),reservid))
-            conn.commit()
-            print("Reservation Updated Successfully")
-    
-    def CancelReservation(self,reservid):
-        reservation = self.GetReservationByID(reservid)
-        if reservation:
-            cursor.execute("delete from Reservation where ReservationID = ?",(reservid))
-            cursor.execute("update Vehicle set Availability = 1 where VehicleID = ?",(reservation[2]))
-            conn.commit()
-            print("Reservation Deleted Successfully")
-        else:
-            print("Reservation not found")
-    
-    def GetReservations(self):
-        cursor.execute("select * from Reservation")
-        reservations = cursor.fetchall()
-        headers = [column[0] for column in cursor.description]
-        return reservations, headers
 
-class ReportGenerator:
-    def __init__(self, reserv_service, vehicle_service):
-        self.reserv_service = reserv_service
-        self.vehicle_service = vehicle_service
-    
-    def generate_reservation_report(self):
-        reservations, headers = self.reserv_service.GetReservations()
-        
-        if reservations:
-            print(tabulate(reservations,headers=headers,tablefmt="psql"))
-            total_revenue = sum(reservation[5] for reservation in reservations)
-            print(f"Total Revenue: {total_revenue}")
-        else:
-            print("No reservations found")
-    
-    def generate_vehicle_report(self):
-        vehicles, headers = self.vehicle_service.GetAllVehicles()
-        
-        if vehicles:
-            print(tabulate(vehicles,headers=headers, tablefmt="psql"))
-        else:
-            print("No vehicles found")
+
 
 
 
@@ -594,7 +358,5 @@ if __name__ == "__main__":
         else: 
             print("See you soon")
             break
-    cursor.close()
-    conn.close()
 
         
