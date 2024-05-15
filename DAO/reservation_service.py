@@ -1,6 +1,7 @@
 from Util.DBConn import DBConnection
 class ReservationService(DBConnection):
     def __init__(self,custservice,vehiserv):
+        super().__init__()
         self.custservice = custservice
         self.vehiserv = vehiserv
     

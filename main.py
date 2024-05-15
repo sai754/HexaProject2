@@ -340,8 +340,9 @@ Do you want to?
                 break
         if choice == 4:
             break
-
-if __name__ == "__main__":
+def MainMenu():
+    customerserv = CustomerService()
+    adminserv = AdminService()
     while(True):
         print("Welcome to CarConnect")
         print("""
@@ -357,6 +358,12 @@ if __name__ == "__main__":
             AdminMenu()
         else: 
             print("See you soon")
+            customerserv.close()
+            adminserv.close()
             break
+
+
+if __name__ == "__main__":
+    MainMenu()
 
         
