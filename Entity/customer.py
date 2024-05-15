@@ -1,3 +1,4 @@
+from Exceptions.exceptions import AuthenticationException
 class Customer:
     def __init__(self,firstname,lastname,email,phonenumber,address,username,password,registrationdate):
         self.__firstname = firstname
@@ -58,4 +59,7 @@ class Customer:
         self.__registrationdate = registrationdate
     
     def Authenticate(self,password):
-        return self.__password == password
+        try:
+            return self.__password == password
+        except AuthenticationException as e:
+            print(e)

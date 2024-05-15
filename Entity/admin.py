@@ -1,3 +1,4 @@
+from Exceptions.exceptions import AuthenticationException
 class Admin:
     def __init__(self,firstname,lastname,email,phonenumber,username,password,role,joindate):
         self.__firstname = firstname
@@ -58,5 +59,8 @@ class Admin:
         self.__joindate = joindate
     
     def Authenticate(self,password):
-        return self.__password == password
+        try:
+            return self.__password == password
+        except AuthenticationException as e:
+            print(e)
     
