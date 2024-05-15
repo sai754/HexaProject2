@@ -1,6 +1,24 @@
 from Util.DBConn import DBConnection
 from tabulate import tabulate
-class VehicleService(DBConnection):
+from abc import ABC, abstractmethod
+
+class IVehicleService(ABC):
+    @abstractmethod
+    def GetVehicleByID(vehicleid):
+        pass
+    @abstractmethod
+    def GetAvailableVehicle():
+        pass
+    @abstractmethod
+    def AddVehicle(vehicle):
+        pass
+    @abstractmethod
+    def UpdateVehicle(vehicle,vehicleid):
+        pass
+    @abstractmethod
+    def RemoveVehicle(vehicleid):
+        pass
+class VehicleService(DBConnection, IVehicleService):
     def GetVehicle(self):
         self.cursor.execute("Select * from Vehicle")
         vehicles = self.cursor.fetchall()

@@ -1,5 +1,23 @@
 from Util.DBConn import DBConnection
-class ReservationService(DBConnection):
+from abc import ABC, abstractmethod
+
+class IReservationService(ABC):
+    @abstractmethod
+    def GetReservationByID(reservationid):
+        pass
+    @abstractmethod
+    def GetReservationByCustomerID(customerid):
+        pass
+    @abstractmethod
+    def CreateReservation(reservation):
+        pass
+    @abstractmethod
+    def UpdateReservation(reservation,reservid,updater):
+        pass
+    @abstractmethod
+    def CancelReservation(reservationid):
+        pass
+class ReservationService(DBConnection, IReservationService):
     def __init__(self,custservice,vehiserv):
         super().__init__()
         self.custservice = custservice

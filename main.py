@@ -64,7 +64,11 @@ Do you want to?
                     else:
                         break
                 if cust_choice == 3:
-                    ReservationMenu(username)
+                    while(True):
+                        ReservationMenu(username)
+                        goBack = int(input("If you want to Go Back press 1 else press 2: "))
+                        if goBack == 1:
+                            break
                 if cust_choice == 4:
                     break
             else:

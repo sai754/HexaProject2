@@ -1,5 +1,23 @@
 from Util.DBConn import DBConnection
 from tabulate import tabulate
+from abc import abstractmethod,ABC
+
+class IAdminService(ABC):
+    @abstractmethod
+    def GetAdminById(adminId):
+        pass
+    @abstractmethod
+    def GetAdminByUsername(username):
+        pass
+    @abstractmethod
+    def RegisterAdmin(adminData):
+        pass
+    @abstractmethod
+    def UpdateAdmin(adminData,adminName):
+        pass
+    @abstractmethod
+    def DeleteAdmin(adminName):
+        pass
 class AdminService(DBConnection):
     def GetAdmin(self,username):
         self.cursor.execute("select * from Admin where Username = ? ",(username))
