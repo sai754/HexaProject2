@@ -1,6 +1,7 @@
 from Util.DBConn import DBConnection
 from tabulate import tabulate
 from abc import abstractmethod,ABC
+from Exceptions.exceptions import AdminNotFoundException
 
 class IAdminService(ABC):
     @abstractmethod
@@ -22,11 +23,20 @@ class AdminService(DBConnection):
     def GetAdmin(self,username):
         self.cursor.execute("select * from Admin where Username = ? ",(username))
         admin = self.cursor.fetchone()
-        headers = [column[0] for column in self.cursor.description]
-        print(tabulate(admin,headers=headers,tablefmt="psql"))
+        if admin:
+            headers = [column[0] for column in self.cursor.description]
+            print(tabulate([admin],headers=headers,tablefmt="psql"))
+        else:
+            raise AdminNotFoundException(f"Admin with username {username} not found")
     def GetAdminById(self,id):
-        self.cursor.execute("Select * from Admin where AdminID = ?",(id))
-        return self.cursor.fetchone()
+        try:
+            self.cursor.execute("Select * from Admin where AdminID = ?",(id))
+            admin = self.cursor.fetchone()
+            if len(admin) == 0:
+                raise AdminNotFoundException
+            return admin
+        except AdminNotFoundException as e:
+            print(e)
     
     def GetAdminByUsername(self,username):
         self.cursor.execute("select * from Admin where Username = ? ",(username))

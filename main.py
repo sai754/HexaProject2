@@ -1,8 +1,33 @@
 from Entity import Reservation, Customer, Admin, Vehicle, ReportGenerator
 from DAO import ReservationService, AdminService, AuthenticationService, CustomerService, VehicleService
 import pyodbc
-import datetime 
+import datetime, re
 from tabulate import tabulate
+from Exceptions.exceptions import VehicleNotFoundException
+from Exceptions.exceptions import InvalidInputException
+
+
+class Validation:
+        
+    def is_valid_email(email):
+        regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+        return re.match(regex, email) is not None
+
+    def is_valid_password(password):
+        if len(password) < 8:
+            return False
+        if not re.search(r'[A-Za-z]', password):
+            return False
+        if not re.search(r'\d', password):
+            return False
+        return True
+
+    def is_valid_date(date_str):
+        try:
+            datetime.strptime(date_str, '%Y-%m-%d')
+            return True
+        except ValueError:
+            return False
 
 
 def CustomerMenu():
@@ -15,18 +40,31 @@ Do you want to?
 2. Login
 3. Exit
  """)
-        choice = int(input("Enter your choice: "))
+        try: 
+            choice = int(input("Enter your choice: "))
+        except ValueError:
+            raise InvalidInputException("Choice must be integer")
+        
         if choice == 1:
             newCustomer = Customer("", "", "", 0, "", "", "", "")
-            newCustomer.set_firstname(input("Enter your First Name: "))
-            newCustomer.set_lastname(input("Enter your Last Name: "))
-            newCustomer.set_email(input("Enter your email: "))
-            newCustomer.set_phonenumber(int(input("Enter your Phone number: ")))
-            newCustomer.set_address(input("Enter your Address: "))
-            newCustomer.set_username(input("Enter your Username: "))
-            newCustomer.set_password(input("Enter your password: "))
-            newCustomer.set_registrationdate(datetime.date.today())
-            customerserv.RegisterCustomer(newCustomer)
+            try:
+                newCustomer.set_firstname(input("Enter your First Name: "))
+                newCustomer.set_lastname(input("Enter your Last Name: "))
+                email = input("Enter your email: ")
+                if not Validation.is_valid_email(email):
+                    raise InvalidInputException("Invalid Email Format")
+                newCustomer.set_email(email)
+                newCustomer.set_phonenumber(int(input("Enter your Phone number: ")))
+                newCustomer.set_address(input("Enter your Address: "))
+                newCustomer.set_username(input("Enter your Username: "))
+                password = input("Enter your password (atleast 5 characters, must have both number and character): ")
+                if not Validation.is_valid_password(password):
+                    raise InvalidInputException("Password must be 5 characters long and must have both character and number")
+                newCustomer.set_password(password)
+                newCustomer.set_registrationdate(datetime.date.today())
+                customerserv.RegisterCustomer(newCustomer)
+            except InvalidInputException as e:
+                print(e)
         if choice == 2:
             username = input("Enter your Username: ")
             password = input("Enter your Password: ")
@@ -43,15 +81,21 @@ Do you want to?
                 if cust_choice == 1:
                     customer = customerserv.GetCustomerByUsername(username)
                     if customer:
-                        ncustomer = Customer("","","",0,"","","","")
-                        ncustomer.set_firstname(input("Enter your First Name: "))
-                        ncustomer.set_lastname(input("Enter your Last Name: "))
-                        ncustomer.set_email(input("Enter your email: "))
-                        ncustomer.set_phonenumber(int(input("Enter your Phone number: ")))
-                        ncustomer.set_address(input("Enter your Address: "))
-                        ncustomer.set_username(input("Enter your Username: "))
-                        ncustomer.set_password(input("Enter your password: "))
-                        customerserv.UpdateCustomer(ncustomer, username)
+                        try: 
+                            ncustomer = Customer("","","",0,"","","","")
+                            ncustomer.set_firstname(input("Enter your First Name: "))
+                            ncustomer.set_lastname(input("Enter your Last Name: "))
+                            email = input("Enter your email: ")
+                            if not Validation.is_valid_email(email):
+                                raise InvalidInputException("Invalid email format.")
+                            ncustomer.set_email(email)
+                            ncustomer.set_phonenumber(int(input("Enter your Phone number: ")))
+                            ncustomer.set_address(input("Enter your Address: "))
+                            ncustomer.set_username(input("Enter your Username: "))
+                            ncustomer.set_password(input("Enter your password: "))
+                            customerserv.UpdateCustomer(ncustomer, username)
+                        except InvalidInputException as e:
+                            print(e)
                     else:
                         print("Customer not found.")
                 if cust_choice == 2:
@@ -89,7 +133,10 @@ def ReservationMenu(username):
 3. Update Reservation
 4. Cancel Reservation
 5. Go back""")
-        choice = int(input("Enter your choice: "))
+        try:
+            choice = int(input("Enter your choice: "))
+        except ValueError:
+            raise InvalidInputException("Choice must be an integer.")
         if choice == 1:
             reservations = reservServ.GetReservationByCustomerName(username)
             if reservations:
@@ -177,16 +224,25 @@ Do you want to
 1. Register Admin
 2. Login
 3. Exit
-""")
-        choice = int(input("Enter your Choice: "))
+""")  
+        try:
+            choice = int(input("Enter your choice: "))
+        except ValueError:
+            raise InvalidInputException("Choice must be an integer.")
         if choice == 1:
             newAdmin = Admin("", "", "", 0, "", "", "", "")
             newAdmin.set_firstname(input("Enter first name: "))
             newAdmin.set_lastname(input("Enter Last name: "))
-            newAdmin.set_email(input("Enter email: "))
+            email = input("Enter email: ")
+            if not Validation.is_valid_email(email):
+                raise InvalidInputException("Invalid email format.")
+            newAdmin.set_email(email)
             newAdmin.set_phonenumber(int(input("Enter phone number: ")))
             newAdmin.set_username(input("Enter username: "))
-            newAdmin.set_password(input("Enter password: "))
+            password = input("Enter password: ")
+            if not Validation.is_valid_password(password):
+                raise InvalidInputException("Password must be at least 5 characters long and contain both letters and numbers.")
+            newAdmin.set_password(password)
             newAdmin.set_role(input("Enter Role: "))
             newAdmin.set_joindate(datetime.date.today())
             Adminserv.RegisterAdmin(newAdmin)
@@ -264,39 +320,48 @@ Do you want to?
         choice = int(input("Enter your choice: "))
         if choice == 1:
             new_vehicle = Vehicle("","","","","",0,0.00)
-            new_vehicle.set_model(input("Enter model: "))
-            new_vehicle.set_make(input("Enter make: "))
-            new_vehicle.set_year(input("Enter year: "))
-            new_vehicle.set_color(input("Enter color: "))
-            new_vehicle.set_registrationnumber(input("Enter registration number: "))                
-            new_vehicle.set_availability(int(input("Enter availability (0 or 1): ")))
-            new_vehicle.set_dailyrate("{:.2f}".format(float(input("Enter daily rate: "))))
-            vehicleserv.AddVehicle(new_vehicle)
+            try:
+                new_vehicle.set_model(input("Enter model: "))
+                new_vehicle.set_make(input("Enter make: "))
+                new_vehicle.set_year(input("Enter year: "))
+                new_vehicle.set_color(input("Enter color: "))
+                new_vehicle.set_registrationnumber(input("Enter registration number: "))                
+                new_vehicle.set_availability(int(input("Enter availability (0 or 1): ")))
+                new_vehicle.set_dailyrate("{:.2f}".format(float(input("Enter daily rate: "))))
+                vehicleserv.AddVehicle(new_vehicle)
+            except Exception as e:
+                raise InvalidInputException(str(e))
         if choice == 2:
             vehicleserv.GetVehicle()
-            vehicleid = int(input("Enter the Vehicle ID to update: "))
-            updateVehicle = vehicleserv.GetVehicleByID(vehicleid)
-            if updateVehicle:
-                print("Enter Updated Details: ")
-                updated_vehicle = Vehicle("","","","","",0,0.00)
-                updated_vehicle.set_model(input("Enter model: "))
-                updated_vehicle.set_make(input("Enter make: "))
-                updated_vehicle.set_year(input("Enter year: "))
-                updated_vehicle.set_color(input("Enter color: "))
-                updated_vehicle.set_registrationnumber(input("Enter registration number: "))
-                updated_vehicle.set_availability(int(input("Enter availability (1 - Available, 0 - Not Available): ")))
-                updated_vehicle.set_dailyrate("{:.2f}".format(float(input("Enter daily rate: "))))
-                vehicleserv.UpdateVehicle(updated_vehicle, vehicleid)
-            else:
-                print("Vehicle Not Found")
+            try:
+                vehicleid = int(input("Enter the Vehicle ID to update: "))
+                updateVehicle = vehicleserv.GetVehicleByID(vehicleid)
+                if updateVehicle:
+                    print("Enter Updated Details: ")
+                    updated_vehicle = Vehicle("","","","","",0,0.00)
+                    updated_vehicle.set_model(input("Enter model: "))
+                    updated_vehicle.set_make(input("Enter make: "))
+                    updated_vehicle.set_year(input("Enter year: "))
+                    updated_vehicle.set_color(input("Enter color: "))
+                    updated_vehicle.set_registrationnumber(input("Enter registration number: "))
+                    updated_vehicle.set_availability(int(input("Enter availability (1 - Available, 0 - Not Available): ")))
+                    updated_vehicle.set_dailyrate("{:.2f}".format(float(input("Enter daily rate: "))))
+                    vehicleserv.UpdateVehicle(updated_vehicle, vehicleid)
+                else:
+                    raise VehicleNotFoundException
+            except VehicleNotFoundException as e:
+                print(e)
         if choice == 3:
             vehicleserv.GetVehicle()
-            vehicleid = int(input("Enter the Vehicle ID to delete: "))
-            delChoice = input("Are you sure? Type (yes) if you are: ")
-            if delChoice == 'yes':
-                vehicleserv.RemoveVehicle(vehicleid)
-            else: 
-                break
+            try:
+                vehicleid = int(input("Enter the Vehicle ID to delete: "))
+                delChoice = input("Are you sure? Type (yes) if you are: ")
+                if delChoice == 'yes':
+                    vehicleserv.RemoveVehicle(vehicleid)
+                else: 
+                    break
+            except ValueError:
+                raise InvalidInputException("Vehicle ID must be Integer")
         if choice == 4:
             break
 def MainMenu():

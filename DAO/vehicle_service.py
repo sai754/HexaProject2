@@ -1,6 +1,7 @@
 from Util.DBConn import DBConnection
 from tabulate import tabulate
 from abc import ABC, abstractmethod
+from Exceptions.exceptions import VehicleNotFoundException
 
 class IVehicleService(ABC):
     @abstractmethod
@@ -26,7 +27,8 @@ class VehicleService(DBConnection, IVehicleService):
         print(tabulate(vehicles,headers=headers,tablefmt="psql"))
     def GetVehicleByID(self,id):
         self.cursor.execute("Select * from Vehicle where VehicleID = ?",(id))
-        return self.cursor.fetchone()
+        vehicle = self.cursor.fetchone()
+        return vehicle
     def GetAvailableVehicle(self):
         self.cursor.execute("Select * from Vehicle where Availability = 1")
         vehicles = self.cursor.fetchall()
@@ -41,15 +43,18 @@ class VehicleService(DBConnection, IVehicleService):
         print("Added Successfully")
     
     def UpdateVehicle(self,vehicle,vehicleid):
-        self.cursor.execute("""
-                       update vehicle
-                       set Model = ?, Make = ?, Year = ?, Color = ?, RegistrationNumber = ?, Availability = ?, DailyRate = ?
-                       where VehicleID = ?""",
-                       (vehicle.get_model(), vehicle.get_make(), vehicle.get_year(),
-                        vehicle.get_color(), vehicle.get_registrationnumber(),
-                        vehicle.get_availability(), vehicle.get_dailyrate(),vehicleid))
-        self.conn.commit()
-        print("Updated Successfully")
+        try:
+            self.cursor.execute("""
+                        update vehicle
+                        set Model = ?, Make = ?, Year = ?, Color = ?, RegistrationNumber = ?, Availability = ?, DailyRate = ?
+                        where VehicleID = ?""",
+                        (vehicle.get_model(), vehicle.get_make(), vehicle.get_year(),
+                            vehicle.get_color(), vehicle.get_registrationnumber(),
+                            vehicle.get_availability(), vehicle.get_dailyrate(),vehicleid))
+            self.conn.commit()
+            print("Updated Successfully")
+        except VehicleNotFoundException as e:
+            print(e)
     
     def RemoveVehicle(self,id):
         self.cursor.execute("delete from Vehicle where VehicleID = ?",(id))
