@@ -65,16 +65,22 @@ class ReservationService(DBConnection, IReservationService):
                 print("Reservation Updated Successfully")
             else:
                 print("Your are not authorized to update this reservation")
-        elif updater == "Admin":
-            self.cursor.execute("""
-                           update Reservation
-                           set CustomerID = ?, VehicleID = ?, StartDate = ?, EndDate = ?, TotalCost = ?, Status = ?
-                           where ReservationID = ?""",
-                           (reservation.get_customerid(),reservation.get_vehicleid(),reservation.get_startdate(),reservation.get_enddate(),
-                            reservation.get_totalcost(),
-                            reservation.get_status(),reservid))
-            self.conn.commit()
-            print("Reservation Updated Successfully")
+        # elif updater == "Admin":
+        #     self.cursor.execute("""
+        #                    update Reservation
+        #                    set CustomerID = ?, VehicleID = ?, StartDate = ?, EndDate = ?, TotalCost = ?, Status = ?
+        #                    where ReservationID = ?""",
+        #                    (reservation.get_customerid(),reservation.get_vehicleid(),reservation.get_startdate(),reservation.get_enddate(),
+        #                     reservation.get_totalcost(),
+        #                     reservation.get_status(),reservid))
+        #     self.conn.commit()
+        #     print("Reservation Updated Successfully")
+    def UpdateReservationByAdmin(self):
+        ReservationService.GetReservations()
+        reserveid = int(input("Enter the Reservation Id you want to update: "))
+        status = input("Do you want to change the status to (Confirmed) or (Completed): ")
+        self.cursor.execute("update Reservation where ReservationID = ? set Status = ?",(reserveid,status))
+        print("Updated Successfully")
     
     def CancelReservation(self,reservid):
         reservation = self.GetReservationByID(reservid)

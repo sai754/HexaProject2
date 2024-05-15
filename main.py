@@ -178,6 +178,7 @@ def ReservationMenu(username):
                 reserveid = int(input("Enter the Reservation ID you want to update: "))
                 newStartDate = input("Enter new Start date (YYYY-MM-DD): ")
                 newEndDate = input("Enter new End Date (YYYY-MM-DD): ")
+                newStatus = input("Enter your Status (Confirmed or Pending)")
                 oldreserve = reservServ.GetReservationByID(reserveid)
                 if oldreserve:
                     vehicle = reservServ.vehiserv.GetVehicleByID(oldreserve[2])
@@ -191,7 +192,7 @@ def ReservationMenu(username):
                         new_reserve.set_startdate(newStartDate)
                         new_reserve.set_enddate(newEndDate)
                         new_reserve.set_totalcost(newTotalCost)
-                        new_reserve.set_status(oldreserve[6])
+                        new_reserve.set_status(newStatus)
                         reservServ.UpdateReservation(updater, reserveid, new_reserve)
                     else:
                         print("Vehicle Not Found")
@@ -218,6 +219,8 @@ def ReservationMenu(username):
 def AdminMenu():
     Adminserv = AdminService()
     authenticaeserv = AuthenticationService(Adminserv)
+    reservServ = ReservationService(CustomerService(),VehicleService())
+
     while(True):
         print("""
 Do you want to
@@ -257,6 +260,7 @@ Do you want to
                       2. Delete Your Account
                       3. Manage Vehicles
                       4. Get Report of Reservations
+                      5. Go Back
                       """)
                 AdminChoice = int(input("Enter your choice: "))
                 if AdminChoice == 1:
@@ -286,6 +290,8 @@ Do you want to
                     VehicleMenu()
                 if AdminChoice == 4:
                     ReportsMenu()  
+                if AdminChoice == 5:
+                    break
             else:
                 print("Invalid Username or Password")
         if choice == 3:
