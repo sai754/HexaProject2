@@ -4,51 +4,6 @@ import pyodbc
 import datetime 
 from tabulate import tabulate
 
-# server_name = "DESKTOP-PR637UP"
-# database_name = "CarConnect"
- 
- 
-# conn_str = (
-#     f"Driver={{ODBC Driver 17 for SQL Server}};"
-#     f"Server={server_name};"
-#     f"Database={database_name};"
-#     f"Trusted_Connection=yes;"
-# )
-
-# conn = pyodbc.connect(conn_str)
-# cursor = conn.cursor()
-
-# print("Database Connected")
-
-
-
-# Entity
-# Customer Entity
-
-
-# Vehicle Entity
-
-
-
-
-
-
-# Service classes
-# Authentication Service
-
-
-
-#Customer Service    
-
-# Vehicle Service
-
-# Admin Service
-
-
-
-
-
-
 
 def CustomerMenu():
     customerserv = CustomerService()
