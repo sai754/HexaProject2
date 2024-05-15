@@ -1,3 +1,4 @@
+from Entity import Reservation, Customer, Admin, Vehicle
 import pyodbc
 import datetime 
 from tabulate import tabulate
@@ -23,237 +24,13 @@ print("Database Connected")
 # Entity
 # Customer Entity
 
-class Customer:
-    def __init__(self,firstname,lastname,email,phonenumber,address,username,password,registrationdate):
-        self.__firstname = firstname
-        self.__lastname = lastname
-        self.__email = email
-        self.__phonenumber = phonenumber
-        self.__address = address
-        self.__username = username
-        self.__password = password
-        self.__registrationdate = registrationdate
-
-    def get_firstname(self):
-        return self.__firstname
-
-    def get_lastname(self):
-        return self.__lastname
-
-    def get_email(self):
-        return self.__email
-
-    def get_phonenumber(self):
-        return self.__phonenumber
-
-    def get_address(self):
-        return self.__address
-
-    def get_username(self):
-        return self.__username
-
-    def get_password(self):
-        return self.__password
-
-    def get_registrationdate(self):
-        return self.__registrationdate
-
-    def set_firstname(self, firstname):
-        self.__firstname = firstname
-
-    def set_lastname(self, lastname):
-        self.__lastname = lastname
-
-    def set_email(self, email):
-        self.__email = email
-
-    def set_phonenumber(self, phonenumber):
-        self.__phonenumber = phonenumber
-
-    def set_address(self, address):
-        self.__address = address
-
-    def set_username(self, username):
-        self.__username = username
-
-    def set_password(self, password):
-        self.__password = password
-
-    def set_registrationdate(self, registrationdate):
-        self.__registrationdate = registrationdate
-    
-    def Authenticate(self,password):
-        return self.__password == password
 
 # Vehicle Entity
-class Vehicle:
-    def __init__(self,model,make,year,color,registrationnumber,availability,dailyrate):
-        self.__model = model
-        self.__make = make
-        self.__year = year
-        self.__color = color
-        self.__registrationnumber = registrationnumber
-        self.__availability = availability
-        self.__dailyrate = dailyrate
-    
-    def get_model(self):
-        return self.__model
-
-    def get_make(self):
-        return self.__make
-
-    def get_year(self):
-        return self.__year
-
-    def get_color(self):
-        return self.__color
-
-    def get_registrationnumber(self):
-        return self.__registrationnumber
-
-    def get_availability(self):
-        return self.__availability
-
-    def get_dailyrate(self):
-        return self.__dailyrate
-
-    def set_model(self, model):
-        self.__model = model
-
-    def set_make(self, make):
-        self.__make = make
-
-    def set_year(self, year):
-        self.__year = year
-
-    def set_color(self, color):
-        self.__color = color
-
-    def set_registrationnumber(self, registrationnumber):
-        self.__registrationnumber = registrationnumber
-
-    def set_availability(self, availability):
-        self.__availability = availability
-
-    def set_dailyrate(self, dailyrate):
-        self.__dailyrate = dailyrate
-
-class Admin:
-    def __init__(self,firstname,lastname,email,phonenumber,username,password,role,joindate):
-        self.__firstname = firstname
-        self.__lastname = lastname
-        self.__email = email
-        self.__phonenumber = phonenumber
-        self.__username = username
-        self.__password = password
-        self.__role = role
-        self.__joindate = joindate
-
-    def get_firstname(self):
-        return self.__firstname
-
-    def get_lastname(self):
-        return self.__lastname
-
-    def get_email(self):
-        return self.__email
-
-    def get_phonenumber(self):
-        return self.__phonenumber
-
-    def get_username(self):
-        return self.__username
-
-    def get_password(self):
-        return self.__password
-
-    def get_role(self):
-        return self.__role
-
-    def get_joindate(self):
-        return self.__joindate
-
-    def set_firstname(self, firstname):
-        self.__firstname = firstname
-    
-    def set_lastname(self, lastname):
-        self.__lastname = lastname
-    
-    def set_email(self, email):
-        self.__email = email
-    
-    def set_phonenumber(self, phonenumber):
-        self.__phonenumber = phonenumber
-    
-    def set_username(self, username):
-        self.__username = username
-    
-    def set_password(self, password):
-        self.__password = password
-    
-    def set_role(self, role):
-        self.__role = role
-    
-    def set_joindate(self, joindate):
-        self.__joindate = joindate
-    
-    def Authenticate(self,password):
-        return self.__password == password
-    
-
-class Reservation:
-    def __init__(self,customerid,vehicleid,startdate,enddate,totalcost,status):
-        self.__customerid = customerid
-        self.__vehicleid = vehicleid
-        self.__startdate = startdate
-        self.__enddate = enddate
-        self.__totalcost = totalcost
-        self.__status = status
 
 
-    def get_customerid(self):
-        return self.__customerid
 
-    def get_vehicleid(self):
-        return self.__vehicleid
 
-    def get_startdate(self):
-        return self.__startdate
 
-    def get_enddate(self):
-        return self.__enddate
-
-    def get_totalcost(self):
-        return self.__totalcost
-
-    def get_status(self):
-        return self.__status
-    
-    def set_customerid(self, customerid):
-        self.__customerid = customerid
-
-    def set_vehicleid(self, vehicleid):
-        self.__vehicleid = vehicleid
-
-    def set_startdate(self, startdate):
-        self.__startdate = startdate
-
-    def set_enddate(self, enddate):
-        self.__enddate = enddate
-
-    def set_totalcost(self, totalcost):
-        self.__totalcost = totalcost
-
-    def set_status(self, status):
-        self.__status = status
-
-    
-    def CalculateTotalCost(startdate,enddate,dailyrate):
-        startdate = datetime.datetime.strptime(startdate,"%Y-%m-%d")
-        enddate = datetime.datetime.strptime(enddate,"%Y-%m-%d")
-        numdays = (enddate - startdate).days
-        totalcost = numdays * dailyrate
-        return totalcost
 
 # Service classes
 # Authentication Service
@@ -433,19 +210,19 @@ class ReservationService:
                        Customer on Reservation.CustomerID = Customer.CustomerID where Customer.Username = ? """,(username))
         return cursor.fetchall()
     def CreateReservation(self,reserv):
-        vehicle = self.vehiserv.GetVehicleByID(reserv.vehicleid)
-        if vehicle:
+        vehicle = self.vehiserv.GetVehicleByID(reserv.get_vehicleid())
+        if vehicle and vehicle[6] == True:
             cursor.execute("Insert into Reservation Values (?,?,?,?,?,?)",
                            (reserv.get_customerid(),reserv.get_vehicleid(),reserv.get_startdate(),reserv.get_enddate(),
                             reserv.get_totalcost(),reserv.get_status()))
-            cursor.execute("update Vehicle set Availability = 0 where VehicleID = ?",reserv.vehicleid)
+            cursor.execute("update Vehicle set Availability = 0 where VehicleID = ?",reserv.get_vehicleid())
             conn.commit()
             print("Reservation Created Successfully")
         else:
             print("Vehicle Not Found or unavailable")
     def UpdateReservation(self,updater,reservid,reservation):
         if updater == "customer":
-            cusomerid = reservation.customerid
+            cusomerid = reservation.get_customerid()
             if self.custservice.CheckOwnership(reservid,cusomerid):
                 cursor.execute("""
                                update Reservation
@@ -612,11 +389,11 @@ def ReservationMenu(username):
                 print(f"Your Total Cost will be {totalcost}")
                 status = "Pending"
                 new_reservation = Reservation(0, 0, "", "", 0.00, "")
-                new_reservation.set_customer_id(customerid)
-                new_reservation.set_vehicle_id(vehicleid)
-                new_reservation.set_start_date(startdate)
-                new_reservation.set_end_date(enddate)
-                new_reservation.set_total_cost(totalcost)
+                new_reservation.set_customerid(customerid)
+                new_reservation.set_vehicleid(vehicleid)
+                new_reservation.set_startdate(startdate)
+                new_reservation.set_enddate(enddate)
+                new_reservation.set_totalcost(totalcost)
                 new_reservation.set_status(status)
                 reservServ.CreateReservation(new_reservation)
             else:
@@ -639,11 +416,11 @@ def ReservationMenu(username):
                         newTotalCost = Reservation.CalculateTotalCost(newStartDate,newEndDate,dailyrate)
                         print(f"Your new Total Cost is {newTotalCost}")
                         new_reserve = Reservation(0, 0, "", "", 0.00, "")
-                        new_reserve.set_customer_id(oldreserve[1])
-                        new_reserve.set_vehicle_id(oldreserve[2])
-                        new_reserve.set_start_date(newStartDate)
-                        new_reserve.set_end_date(newEndDate)
-                        new_reserve.set_total_cost(newTotalCost)
+                        new_reserve.set_customerid(oldreserve[1])
+                        new_reserve.set_vehicleid(oldreserve[2])
+                        new_reserve.set_startdate(newStartDate)
+                        new_reserve.set_enddate(newEndDate)
+                        new_reserve.set_totalcost(newTotalCost)
                         new_reserve.set_status(oldreserve[6])
                         reservServ.UpdateReservation(updater, reserveid, new_reserve)
                     else:
