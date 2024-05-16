@@ -65,10 +65,23 @@ class TestVehcile(unittest.TestCase):
         retrivedUpdatedVehicle = self.vehicle_service.GetVehicleByRegistrationNumber("ASDF123")
         self.assertEqual(retrivedUpdatedVehicle[1],"DEF")
         self.assertEqual(retrivedUpdatedVehicle[2],"AAA")
+
+    def test_get_available_vehicles(self):
+        vehicles = self.vehicle_service.GetAvailableVehicle()
+
+        self.assertEqual(len(vehicles),3)
+
+    def test_get_all_vehciles(self):
+        vehicles,headers = self.vehicle_service.GetAllVehicles()
+
+        self.assertEqual(len(vehicles),5)
         
     def tearDown(self):
-        retrivedVehicle = self.vehicle_service.GetVehicleByRegistrationNumber("ASDF123")
-        self.vehicle_service.RemoveVehicle(retrivedVehicle[0])
+        try:
+            retrivedVehicle = self.vehicle_service.GetVehicleByRegistrationNumber("ASDF123")
+            self.vehicle_service.RemoveVehicle(retrivedVehicle[0])
+        except: 
+            pass
 
     
     

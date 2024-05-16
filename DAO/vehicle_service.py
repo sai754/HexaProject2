@@ -38,6 +38,7 @@ class VehicleService(DBConnection, IVehicleService):
         vehicles = self.cursor.fetchall()
         headers = [column[0] for column in self.cursor.description]
         print(tabulate(vehicles,headers=headers,tablefmt="psql"))
+        return vehicles
     def AddVehicle(self,vehicle):
         self.cursor.execute("insert into Vehicle values (?,?,?,?,?,?,?)",
                        (vehicle.get_model(), vehicle.get_make(), vehicle.get_year(),
