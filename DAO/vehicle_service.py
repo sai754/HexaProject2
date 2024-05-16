@@ -20,6 +20,10 @@ class IVehicleService(ABC):
     def RemoveVehicle(vehicleid):
         pass
 class VehicleService(DBConnection, IVehicleService):
+
+    def GetVehicleByRegistrationNumber(self,RegNo):
+        self.cursor.execute("Select * from Vehicle where RegistrationNumber = ?",(RegNo))
+        return self.cursor.fetchone()
     def GetVehicle(self):
         self.cursor.execute("Select * from Vehicle")
         vehicles = self.cursor.fetchall()
