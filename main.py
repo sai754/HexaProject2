@@ -1,7 +1,5 @@
 from Entity import Reservation, Customer, Admin, Vehicle, ReportGenerator
 from DAO import ReservationService, AdminService, AuthenticationService, CustomerService, VehicleService, Validation
-import pyodbc
-import re
 from datetime import datetime
 from tabulate import tabulate
 from Exceptions.exceptions import VehicleNotFoundException
@@ -160,6 +158,9 @@ def ReservationMenu(username):
                 reserveid = int(input("Enter the Reservation ID you want to update: "))
                 newStartDate = input("Enter new Start date (YYYY-MM-DD): ")
                 newEndDate = input("Enter new End Date (YYYY-MM-DD): ")
+                if Validation.is_valid_date(startdate) and Validation.is_valid_date(enddate) == False:
+                    print("Invalid Date Format")
+                    break
                 newStatus = input("Enter your Status (Confirmed or Pending)")
                 oldreserve = reservServ.GetReservationByID(reserveid)
                 if oldreserve:
@@ -251,7 +252,10 @@ Do you want to
                     updateAdmin = Admin("","","",0,"","","","")
                     updateAdmin.set_firstname(input("Enter first name: "))
                     updateAdmin.set_lastname(input("Enter Last name: "))
-                    updateAdmin.set_email(input("Enter email: "))
+                    email = input("Enter email: ")
+                    if not Validation.is_valid_email(email):
+                        raise InvalidInputException("Invalid email format.")
+                    updateAdmin.set_email(email)
                     updateAdmin.set_phonenumber(int(input("Enter phone number: ")))
                     updateAdmin.set_username(input("Enter username: "))
                     updateAdmin.set_password(input("Enter password: "))
@@ -332,7 +336,11 @@ Do you want to?
                     updated_vehicle.set_year(input("Enter year: "))
                     updated_vehicle.set_color(input("Enter color: "))
                     updated_vehicle.set_registrationnumber(input("Enter registration number: "))
-                    updated_vehicle.set_availability(int(input("Enter availability (1 - Available, 0 - Not Available): ")))
+                    available = int(input("Enter availability (1 - Available, 0 - Not Available): "))
+                    if available not in (1,0):
+                        print("Enter only 1 or 0")
+                        break
+                    updated_vehicle.set_availability(available)
                     updated_vehicle.set_dailyrate("{:.2f}".format(float(input("Enter daily rate: "))))
                     vehicleserv.UpdateVehicle(updated_vehicle, vehicleid)
                 else:
