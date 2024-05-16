@@ -68,3 +68,8 @@ class CustomerService(DBConnection, ICustomerService):
         self.cursor.execute("Select CustomerID from Customer where Username = ?",(username))
         custid = self.cursor.fetchone()[0]
         return custid
+    
+    def GetCustomerbyIdTest(self,username):
+        self.cursor.execute("Select CustomerID from Customer where Username = ?",(username))
+        custid = self.cursor.fetchone()
+        return custid
