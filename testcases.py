@@ -56,6 +56,16 @@ class TestVehcile(unittest.TestCase):
         self.assertEqual(retrivedVehicle[1],"ABC")
         self.assertEqual(retrivedVehicle[2],"XYZ")
 
+    def test_update_vehicle(self):
+        newVehicle = Vehicle(model="ABC", make="XYZ",year="2018",color="blue",registrationnumber="ASDF123",availability=1,dailyrate=50.00)
+        self.vehicle_service.AddVehicle(newVehicle)
+        retrivedVehicle = self.vehicle_service.GetVehicleByRegistrationNumber("ASDF123")
+        updateVehicle = Vehicle(model="DEF", make="AAA",year="2018",color="blue",registrationnumber="ASDF123",availability=1,dailyrate=50.00)
+        self.vehicle_service.UpdateVehicle(updateVehicle,retrivedVehicle[0])
+        retrivedUpdatedVehicle = self.vehicle_service.GetVehicleByRegistrationNumber("ASDF123")
+        self.assertEqual(retrivedUpdatedVehicle[1],"DEF")
+        self.assertEqual(retrivedUpdatedVehicle[2],"AAA")
+        
     def tearDown(self):
         retrivedVehicle = self.vehicle_service.GetVehicleByRegistrationNumber("ASDF123")
         self.vehicle_service.RemoveVehicle(retrivedVehicle[0])
