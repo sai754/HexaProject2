@@ -1,4 +1,5 @@
-import re, datetime
+import re
+from datetime import datetime
 class Validation:
         
     def is_valid_email(email):

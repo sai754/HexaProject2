@@ -1,5 +1,6 @@
 from Util.DBConn import DBConnection
 from abc import ABC, abstractmethod
+from tabulate import tabulate
 
 class ICustomerService(ABC):
     @abstractmethod
@@ -21,8 +22,9 @@ class CustomerService(DBConnection, ICustomerService):
 
     def GetCustomer(self,username):
         self.cursor.execute("select * from Customer where Username = ?",(username))
-        for row in self.cursor:
-            print(row)
+        customer = self.cursor.fetchone()
+        headers = [column[0] for column in self.cursor.description]
+        print(tabulate([customer],headers=headers,tablefmt='psql'))
     def GetCustomerByID(self,id):
         self.cursor.execute("Select * from Customer where CustomerID = ?",(id,))
         return self.cursor.fetchone()

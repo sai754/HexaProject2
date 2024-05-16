@@ -1,7 +1,8 @@
 from Entity import Reservation, Customer, Admin, Vehicle, ReportGenerator
 from DAO import ReservationService, AdminService, AuthenticationService, CustomerService, VehicleService, Validation
 import pyodbc
-import datetime, re
+import re
+from datetime import datetime
 from tabulate import tabulate
 from Exceptions.exceptions import VehicleNotFoundException
 from Exceptions.exceptions import InvalidInputException
@@ -117,9 +118,9 @@ def ReservationMenu(username):
         if choice == 1:
             reservations = reservServ.GetReservationByCustomerName(username)
             if reservations:
-                print("Your Reservations: ")
-                for reserve in reservations:
-                    print(reserve)
+                print("Your Reservations are Above ")
+                # for reserve in reservations:
+                #     print(reserve)
             else:
                 print("You dont have any reservations")
         if choice == 2:
@@ -129,22 +130,26 @@ def ReservationMenu(username):
             vehicleid = int(input("Enter the Vehicle ID: "))
             startdate = input("Enter the Start Date (YYYY-MM-DD): ")
             enddate = input("Enter End Date (YYYY-MM-DD): ")
-            vehicle = reservServ.vehiserv.GetVehicleByID(vehicleid)
-            if vehicle:
-                dailyrate = float(vehicle[7])
-                totalcost = Reservation.CalculateTotalCost(startdate,enddate,dailyrate)
-                print(f"Your Total Cost will be {totalcost}")
-                status = "Pending"
-                new_reservation = Reservation(0, 0, "", "", 0.00, "")
-                new_reservation.set_customerid(customerid)
-                new_reservation.set_vehicleid(vehicleid)
-                new_reservation.set_startdate(startdate)
-                new_reservation.set_enddate(enddate)
-                new_reservation.set_totalcost(totalcost)
-                new_reservation.set_status(status)
-                reservServ.CreateReservation(new_reservation)
+            if Validation.is_valid_date(startdate) and Validation.is_valid_date(enddate) == False:
+                print("Invalid Date Format")
+                break
             else:
-                print("Vehicle Not Found")
+                vehicle = reservServ.vehiserv.GetVehicleByID(vehicleid)
+                if vehicle:
+                    dailyrate = float(vehicle[7])
+                    totalcost = Reservation.CalculateTotalCost(startdate,enddate,dailyrate)
+                    print(f"Your Total Cost will be {totalcost}")
+                    status = "Pending"
+                    new_reservation = Reservation(0, 0, "", "", 0.00, "")
+                    new_reservation.set_customerid(customerid)
+                    new_reservation.set_vehicleid(vehicleid)
+                    new_reservation.set_startdate(startdate)
+                    new_reservation.set_enddate(enddate)
+                    new_reservation.set_totalcost(totalcost)
+                    new_reservation.set_status(status)
+                    reservServ.CreateReservation(new_reservation)
+                else:
+                    print("Vehicle Not Found")
         if choice == 3:
             updater = "customer"
             reservations = reservServ.GetReservationByCustomerName(username)

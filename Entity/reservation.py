@@ -47,8 +47,8 @@ class Reservation:
 
     
     def CalculateTotalCost(startdate,enddate,dailyrate):
-        startdate = datetime.datetime.strptime(startdate,"%Y-%m-%d")
-        enddate = datetime.datetime.strptime(enddate,"%Y-%m-%d")
+        startdate = datetime.strptime(startdate,"%Y-%m-%d")
+        enddate = datetime.strptime(enddate,"%Y-%m-%d")
         numdays = (enddate - startdate).days
         totalcost = numdays * dailyrate
         return totalcost

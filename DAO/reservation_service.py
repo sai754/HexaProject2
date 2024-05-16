@@ -1,6 +1,7 @@
 from Util.DBConn import DBConnection
 from abc import ABC, abstractmethod
 from Exceptions.exceptions import ReservationException
+from tabulate import tabulate
 
 class IReservationService(ABC):
     @abstractmethod
@@ -35,7 +36,10 @@ class ReservationService(DBConnection, IReservationService):
     def GetReservationByCustomerName(self,username):
         self.cursor.execute("""Select ReservationID,Reservation.CustomerID,VehicleID, StartDate,EndDate,TotalCost,Status from Reservation join 
                        Customer on Reservation.CustomerID = Customer.CustomerID where Customer.Username = ? """,(username))
-        return self.cursor.fetchall()
+        customer = self.cursor.fetchall()
+        headers = [column[0] for column in self.cursor.description]
+        print(tabulate([customer],headers=headers,tablefmt='psql'))
+        return customer
     def CreateReservation(self,reserv):
         try:
             vehicle = self.vehiserv.GetVehicleByID(reserv.get_vehicleid())
