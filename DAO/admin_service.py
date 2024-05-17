@@ -53,11 +53,11 @@ class AdminService(DBConnection):
     def UpdateAdmin(self,admin,adminname):
         self.cursor.execute("""Update Admin
                        set FirstName = ?, LastName = ?, Email = ?, PhoneNumber = ?, Username = ?, Password = ?,
-                       Role = ?, JoinDate = ?
+                       Role = ?
                        where Username = ?""",
                        (admin.get_firstname(), admin.get_lastname(), admin.get_email(),
                         admin.get_phonenumber(), admin.get_username(), admin.get_password(),
-                        admin.get_role(), admin.get_joindate(),adminname))
+                        admin.get_role(),adminname))
         self.conn.commit()
         print("Updated Successfully")
     
@@ -65,3 +65,8 @@ class AdminService(DBConnection):
         self.cursor.execute("delete from Admin where Username = ?",(adminname))
         self.conn.commit()
         print("Deleted Successfully")
+
+    def CheckEmail(self, email):
+        self.cursor.execute("Select count(*) from Admin where Email = ?", (email))
+        count = self.cursor.fetchone()[0]
+        return count > 0

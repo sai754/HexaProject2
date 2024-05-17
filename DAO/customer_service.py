@@ -73,3 +73,8 @@ class CustomerService(DBConnection, ICustomerService):
         self.cursor.execute("Select CustomerID from Customer where Username = ?",(username))
         custid = self.cursor.fetchone()
         return custid
+    
+    def CheckEmail(self, email):
+        self.cursor.execute("Select count(*) from Customer where Email = ?", (email))
+        count = self.cursor.fetchone()[0]
+        return count > 0

@@ -1,6 +1,6 @@
 from Entity import Reservation, Customer, Admin, Vehicle, ReportGenerator
 from DAO import ReservationService, AdminService, AuthenticationService, CustomerService, VehicleService, Validation
-from datetime import datetime
+from datetime import datetime, date
 from tabulate import tabulate
 from Exceptions.exceptions import VehicleNotFoundException
 from Exceptions.exceptions import InvalidInputException
@@ -29,15 +29,18 @@ Do you want to?
                 email = input("Enter your email: ")
                 if not Validation.is_valid_email(email):
                     raise InvalidInputException("Invalid Email Format")
+                if customerserv.CheckEmail(email):
+                    print("Email Already Exists")
+                    break
                 newCustomer.set_email(email)
                 newCustomer.set_phonenumber(int(input("Enter your Phone number: ")))
                 newCustomer.set_address(input("Enter your Address: "))
                 newCustomer.set_username(input("Enter your Username: "))
-                password = input("Enter your password (atleast 5 characters, must have both number and character): ")
+                password = input("Enter your password (atleast 8 characters, must have both number and character): ")
                 if not Validation.is_valid_password(password):
-                    raise InvalidInputException("Password must be 5 characters long and must have both character and number")
+                    raise InvalidInputException("Password must be 8 characters long and must have both character and number")
                 newCustomer.set_password(password)
-                newCustomer.set_registrationdate(datetime.date.today())
+                newCustomer.set_registrationdate(date.today())
                 customerserv.RegisterCustomer(newCustomer)
             except InvalidInputException as e:
                 print(e)
@@ -64,11 +67,14 @@ Do you want to?
                             email = input("Enter your email: ")
                             if not Validation.is_valid_email(email):
                                 raise InvalidInputException("Invalid email format.")
+                            if customerserv.CheckEmail(email):
+                                print("Email Already Exists")
+                                break
                             ncustomer.set_email(email)
                             ncustomer.set_phonenumber(int(input("Enter your Phone number: ")))
                             ncustomer.set_address(input("Enter your Address: "))
                             ncustomer.set_username(input("Enter your Username: "))
-                            ncustomer.set_password(input("Enter your password: "))
+                            ncustomer.set_password(input("Enter password (Should be 8 Charachters long and have both character and numbers): "))
                             customerserv.UpdateCustomer(ncustomer, username)
                         except InvalidInputException as e:
                             print(e)
@@ -117,8 +123,6 @@ def ReservationMenu(username):
             reservations = reservServ.GetReservationByCustomerName(username)
             if reservations:
                 print("Your Reservations are Above ")
-                # for reserve in reservations:
-                #     print(reserve)
             else:
                 print("You dont have any reservations")
         if choice == 2:
@@ -222,15 +226,18 @@ Do you want to
             email = input("Enter email: ")
             if not Validation.is_valid_email(email):
                 raise InvalidInputException("Invalid email format.")
+            if Adminserv.CheckEmail(email):
+                print("Email Already Exists")
+                break
             newAdmin.set_email(email)
             newAdmin.set_phonenumber(int(input("Enter phone number: ")))
             newAdmin.set_username(input("Enter username: "))
-            password = input("Enter password: ")
+            password = input("Enter password (Should be 8 Charachters long and have both character and numbers): ")
             if not Validation.is_valid_password(password):
-                raise InvalidInputException("Password must be at least 5 characters long and contain both letters and numbers.")
+                raise InvalidInputException("Password must be at least 8 characters long and contain both letters and numbers.")
             newAdmin.set_password(password)
             newAdmin.set_role(input("Enter Role: "))
-            newAdmin.set_joindate(datetime.date.today())
+            newAdmin.set_joindate(date.today())
             Adminserv.RegisterAdmin(newAdmin)
         if choice == 2:
             username = input("Enter your Username: ")
@@ -255,14 +262,15 @@ Do you want to
                     email = input("Enter email: ")
                     if not Validation.is_valid_email(email):
                         raise InvalidInputException("Invalid email format.")
+                    if Adminserv.CheckEmail(email):
+                        print("Email Already Exists")
+                        break
                     updateAdmin.set_email(email)
                     updateAdmin.set_phonenumber(int(input("Enter phone number: ")))
                     updateAdmin.set_username(input("Enter username: "))
-                    updateAdmin.set_password(input("Enter password: "))
+                    updateAdmin.set_password(input("Enter password (Should be 8 Charachters long and have both character and numbers):"))
                     updateAdmin.set_role(input("Enter Role: "))
-                    date_entry = input('Enter date in YYYY-MM-DD format: ')
-                    year, month, day = map(int, date_entry.split('-'))
-                    updateAdmin.set_joindate(datetime.date(year, month, day))
+                    updateAdmin.set_joindate("")
                     Adminserv.UpdateAdmin(updateAdmin,username)
                 if AdminChoice == 2:
                     Adminserv.GetAdmin(username)
