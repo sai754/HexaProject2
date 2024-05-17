@@ -37,8 +37,8 @@ class ReservationService(DBConnection, IReservationService):
         self.cursor.execute("""Select ReservationID,Reservation.CustomerID,VehicleID, StartDate,EndDate,TotalCost,Status from Reservation join 
                        Customer on Reservation.CustomerID = Customer.CustomerID where Customer.Username = ? """,(username))
         customer = self.cursor.fetchall()
-        headers = [column[0] for column in self.cursor.description]
-        print(tabulate([customer],headers=headers,tablefmt='psql'))
+        for row in customer:
+            print(row)
         return customer
     def CreateReservation(self,reserv):
         try:

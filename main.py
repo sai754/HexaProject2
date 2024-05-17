@@ -162,7 +162,7 @@ def ReservationMenu(username):
                 reserveid = int(input("Enter the Reservation ID you want to update: "))
                 newStartDate = input("Enter new Start date (YYYY-MM-DD): ")
                 newEndDate = input("Enter new End Date (YYYY-MM-DD): ")
-                if Validation.is_valid_date(startdate) and Validation.is_valid_date(enddate) == False:
+                if Validation.is_valid_date(newStartDate) and Validation.is_valid_date(newEndDate) == False:
                     print("Invalid Date Format")
                     break
                 newStatus = input("Enter your Status (Confirmed or Pending)")
