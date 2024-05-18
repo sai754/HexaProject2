@@ -2,23 +2,9 @@ from Util.DBConn import DBConnection
 from abc import ABC, abstractmethod
 from Exceptions.exceptions import ReservationException
 from tabulate import tabulate
+from Interface import IReservationService
 
-class IReservationService(ABC):
-    @abstractmethod
-    def GetReservationByID(reservationid):
-        pass
-    @abstractmethod
-    def GetReservationByCustomerID(customerid):
-        pass
-    @abstractmethod
-    def CreateReservation(reservation):
-        pass
-    @abstractmethod
-    def UpdateReservation(reservation,reservid,updater):
-        pass
-    @abstractmethod
-    def CancelReservation(reservationid):
-        pass
+
 class ReservationService(DBConnection, IReservationService):
     def __init__(self,custservice,vehiserv):
         super().__init__()

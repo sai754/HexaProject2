@@ -2,24 +2,8 @@ from Util.DBConn import DBConnection
 from tabulate import tabulate
 from abc import abstractmethod,ABC
 from Exceptions.exceptions import AdminNotFoundException
-
-class IAdminService(ABC):
-    @abstractmethod
-    def GetAdminById(adminId):
-        pass
-    @abstractmethod
-    def GetAdminByUsername(username):
-        pass
-    @abstractmethod
-    def RegisterAdmin(adminData):
-        pass
-    @abstractmethod
-    def UpdateAdmin(adminData,adminName):
-        pass
-    @abstractmethod
-    def DeleteAdmin(adminName):
-        pass
-class AdminService(DBConnection):
+from Interface import IAdminService
+class AdminService(DBConnection, IAdminService):
     def GetAdmin(self,username):
         self.cursor.execute("select * from Admin where Username = ? ",(username))
         admin = self.cursor.fetchone()
