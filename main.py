@@ -1,7 +1,6 @@
 from Entity import Reservation, Customer, Admin, Vehicle, ReportGenerator
 from DAO import ReservationService, AdminService, AuthenticationService, CustomerService, VehicleService, Validation
 from datetime import datetime, date
-from tabulate import tabulate
 from Exceptions.exceptions import VehicleNotFoundException
 from Exceptions.exceptions import InvalidInputException
 

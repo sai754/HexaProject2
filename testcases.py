@@ -42,12 +42,12 @@ class TestCustomerAuthentication(unittest.TestCase):
         self.custom_serv.DeleteCustomer(customer_id)
         print("Deleted Successfully")
 
-class TestVehcile(unittest.TestCase):
+class TestVehicle(unittest.TestCase):
 
     def setUp(self):
         self.vehicle_service = VehicleService()
 
-    def test_add_new_vehcile(self):
+    def test_add_new_vehicle(self):
         newVehicle = Vehicle(model="ABC", make="XYZ",year="2018",color="blue",registrationnumber="ASDF123",availability=1,dailyrate=50.00)
 
         self.vehicle_service.AddVehicle(newVehicle)

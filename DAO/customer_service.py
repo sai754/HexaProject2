@@ -16,7 +16,10 @@ class CustomerService(DBConnection, ICustomerService):
 
     def GetCustomerByUsername(self,username):
         self.cursor.execute("Select * from Customer where Username = ?",(username,))
-        return self.cursor.fetchone()
+        customer =  self.cursor.fetchone()
+        headers = [column[0] for column in self.cursor.description]
+        print(tabulate([customer],headers=headers,tablefmt='psql'))
+        return customer
 
     def RegisterCustomer(self,newCustomer):
         self.cursor.execute("insert into Customer values (?,?,?,?,?,?,?,?)",
