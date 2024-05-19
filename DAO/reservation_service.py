@@ -55,16 +55,6 @@ class ReservationService(DBConnection, IReservationService):
                 print("Reservation Updated Successfully")
             else:
                 print("Your are not authorized to update this reservation")
-        # elif updater == "Admin":
-        #     self.cursor.execute("""
-        #                    update Reservation
-        #                    set CustomerID = ?, VehicleID = ?, StartDate = ?, EndDate = ?, TotalCost = ?, Status = ?
-        #                    where ReservationID = ?""",
-        #                    (reservation.get_customerid(),reservation.get_vehicleid(),reservation.get_startdate(),reservation.get_enddate(),
-        #                     reservation.get_totalcost(),
-        #                     reservation.get_status(),reservid))
-        #     self.conn.commit()
-        #     print("Reservation Updated Successfully")
     def UpdateReservationByAdmin(self):
         ReservationService.GetReservations()
         reserveid = int(input("Enter the Reservation Id you want to update: "))
@@ -84,6 +74,17 @@ class ReservationService(DBConnection, IReservationService):
     
     def GetReservations(self):
         self.cursor.execute("select * from Reservation")
+        reservations = self.cursor.fetchall()
+        headers = [column[0] for column in self.cursor.description]
+        return reservations, headers
+    
+    def GetReservationReport(self):
+        self.cursor.execute("""
+                            select c.CustomerID, c.FirstName, v.Model, v.Make, c.Email, c.Address, 
+                            r.ReservationID, r.VehicleID, r.TotalCost, r.Status, 
+                            r.EndDate from Reservation r join Customer c on 
+                            r.CustomerID = c.CustomerID join 
+                            Vehicle v on r.VehicleID = v.VehicleID""")
         reservations = self.cursor.fetchall()
         headers = [column[0] for column in self.cursor.description]
         return reservations, headers

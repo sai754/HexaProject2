@@ -83,3 +83,7 @@ where Customer.Username = 'SaiSC';
 delete from Admin where AdminID = 4
 
 delete from Vehicle where VehicleID = 8
+
+select c.CustomerID, c.FirstName, v.Model, v.Make, c.Email, c.Address, r.ReservationID, r.VehicleID, r.TotalCost, r.Status, 
+r.EndDate from Reservation r join Customer c on 
+r.CustomerID = c.CustomerID join Vehicle v on r.VehicleID = v.VehicleID; 

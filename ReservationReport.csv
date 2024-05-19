@@ -1,0 +1,4 @@
+CustomerID,FirstName,Model,Make,Email,Address,ReservationID,VehicleID,TotalCost,Status,EndDate
+1,Sai,Civic,Honda,gis@example.com,"Ambattur, Chennai",1,1,150.00,Completed,2024-04-20
+2,Rex,Virtus,Volkswagen,cde@example.com,"Tamabaram, Chennai",2,2,280.00,Confirmed,2024-05-15
+4,Subash,LaFerrari,Ferrari,ppp@example.com,Ambattur,6,7,1000.00,Pending,2024-06-01
